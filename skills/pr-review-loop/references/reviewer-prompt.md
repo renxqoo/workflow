@@ -26,7 +26,9 @@
 1. `git fetch origin {BASE_BRANCH} {BRANCH}`（本地分支可能陈旧）；
 2. `git diff origin/{BASE_BRANCH}...origin/{BRANCH}`；
 3. 为空（常见于 PR 已合并、基准已前进）→ 降级
-   `git diff $(git merge-base origin/{BASE_BRANCH} origin/{BRANCH})..origin/{BRANCH}`；
+   `git diff $(git merge-base origin/{BASE_BRANCH} origin/{BRANCH})..origin/{BRANCH}`
+   （fallback 命令成功但输出仍为空 = 分支即 merge-base，如 PR 已合并，
+   同样走下一步）；
 4. 仍取不到 → 有 `gh` 则 `gh pr diff {PR_NUMBER}`；都没有 → **立即报告
    主会话「diff 不可得」并停止**。空 diff 不等于没问题——禁止对空 diff
    输出 no findings。
@@ -37,8 +39,9 @@
 
 ## 你的审查章程
 
-先读 {RUBRIC_FILE_PATH}（绝对路径；读不到时告知主会话，主会话会把全文
-贴给你）中的 **{SECTION} 一节**——那是你的信号清单与证据要求，只此一节。
+先读 {RUBRIC_FILE_PATH}（绝对路径；读不到时告知主会话，主会话会把**该节
+内容**（仍只此一节，非全文）贴给你）中的 **{SECTION} 一节**——那是你的
+信号清单与证据要求，只此一节。
 其他节的维度属于其他审查路，越界观察（如果真有）一句话附注即可，不展开。
 
 ## 指令
