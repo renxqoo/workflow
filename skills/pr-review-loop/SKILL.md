@@ -1,6 +1,6 @@
 ---
 name: pr-review-loop
-description: PR 建立后的对抗审查-修复-复查循环，直到代码可安全合并。代码已写完、本地门禁已绿之后使用：并行派多个独立审查 agent 按 diff 风险面组路审查（正确性固定 + 风险路按触发条件），finding 分级四分类处置（修/顺手修/落档不改/驳回），修复后推回远端并让原审查者复查，循环直到全部通过或触发诊断升级。当用户说「提交 PR 然后审到没问题」「用 agent 循环审查」「review until clean」「上线前把把关」「多路审查这个 PR」时使用——即使只说「帮我审一下这个 PR」也先过本 skill。不接管代码实现（feature-dev 类 skill 的领地）与合并部署（用户裁决）。
+description: PR 建立后的对抗审查-修复-复查循环，直到代码可安全合并。代码已写完、本地门禁已绿之后使用：派多个独立审查 agent 按 diff 风险面组路审查，finding 四分类处置，修复推送后原审查者复查，循环到全部通过（5 软轮上限+诊断升级）。当用户说「提交 PR 然后审到没问题」「用 agent 循环审查」「review until clean」「review this PR before merge」「上线前把把关」时使用——即使只说「帮我审一下这个 PR」也先过本 skill。不接管代码实现与合并部署。
 ---
 
 # PR 审查循环（建 PR → 组路 → 审查-修复-复查循环 → 收口）
@@ -24,14 +24,22 @@ description: PR 建立后的对抗审查-修复-复查循环，直到代码可�
 
 **环境能力探测（决定执行形态，缺什么降级什么，如实标注）：**
 
-- **基准分支**：`main` / `master` / `develop`（`git branch` 或问远端默认分支）；
-- **验证命令集**：读 `package.json` scripts / CI 配置（`.github/workflows` 等）/
-  `Makefile`，找出等价于 typecheck / lint / test / build 的命令。不要发明命令，
-  用项目已有的；
+- **基准分支**：`git symbolic-ref refs/remotes/origin/HEAD`（取不到时
+  `git remote show origin` 或看远端仓库设置；main / master / develop 均常见）；
+- **验证命令集**：枚举 CI 配置（`.github/workflows` 等）里**每个 job**，
+  逐个映射出本地等价命令；再读 `package.json` scripts / `Makefile` 补齐。
+  typecheck / lint / test / build 只是最小集——format / coverage / 边界
+  检查等任何 CI 强制项都进验证命令集。不要发明命令，用项目已有的；
+- **环境对齐**：读 CI job 的 services/env 块（数据库、Redis、密钥），
+  本地缺的依赖会让部分测试静默 skip（看起来绿，CI 必挂）——本地跑不了
+  的项在收口报告标注「本地未覆盖、CI 将验证」，不当全绿报；
 - **PR 工具**：有 `gh` CLI → 建 PR；无 → 推分支，报告 diff 供人工审（审查循环
-  照常跑，只是产物是「分支 + 报告」而非 PR）;
-- **子 agent 工具**：有 → 并行多路审查（本 skill 完整形态）；无 → 降级为单会话
-  串行自审（明显弱化：自证偏差没有被隔离），必须向用户说明降级风险。
+  照常跑，只是产物是「分支 + 报告」而非 PR）；
+- **子 agent 工具**：有 → 并行多路审查（本 skill 完整形态）；无 → 降级为
+  单会话串行自审（自证偏差没有被隔离），向用户说明降级风险；
+- **会话恢复能力**：平台能向已 spawned 的 agent 续发消息（resume）→ 用
+  「原者复查」机制；只能一次性 spawn → 每轮 fresh agent + 复查消息里
+  重放其上轮报告的关键 finding（上下文重建，成本略高）。
 
 ## 阶段 1：建 PR（仅当 PR 不存在）
 
@@ -48,17 +56,19 @@ description: PR 建立后的对抗审查-修复-复查循环，直到代码可�
 
 - **路 A 恒定——正确性/契约**（任何 diff 都适用）：读
   `references/rubric-correctness.md` 作为章程；
-- **路 B（+C）按触发条件**：读 `references/rubric-risk-lanes.md` 的判定表，
-  命中哪条组哪路（UI 前端 / 并发事务 / 公共导出 / 安全敏感 / 生产可用性 /
-  性能量级）。都没命中 → 路 B 缺省为「结构完整性与可维护性」轻量章程
-  （也在该文件内）；
-- **两路指令刻意不重叠**：同一问题被两路独立发现 = 高置信，处置优先级置顶；
-  指令重叠 = 浪费 token 且制造伪共识。
+- **路 B（+C）按触发条件**：读 `references/rubric-risk-lanes.md` 的实质性
+  过滤段 + 判定表，命中哪条组哪路（UI 前端 / 并发事务 / 公共导出 / 安全
+  敏感 / 生产可用性 / 性能量级）。都没命中 → 路 B 缺省为「结构完整性与
+  可维护性」轻量章程（也在该文件内）；
+- **两路指令刻意不重叠——物理上不重叠**：每路只喂它自己的章程节
+  （同文件不同节也只给节锚点，不给全文），否则两路同报会被当成
+  「双路共识」高置信信号——章程重叠制造的共识是伪共识，污染置信信号；
+  同一问题被两路独立发现 = 高置信，处置优先级置顶。
 
 派发用 `references/reviewer-prompt.md` 模板填：意图（commit message / PR 描述
-提炼）、diff 获取方式（让 agent 自己跑 `git diff base...HEAD`，不贴全量 diff
-进 prompt）、对应 rubric 文件路径。**审查 agent 只读**——明确禁止其改代码，
-代码修改永远回到主会话。
+提炼）、仓库/分支/基准（绝对路径；模板内含 diff 获取与空 diff 降级链，
+不贴全量 diff 进 prompt）、对应章程的**文件绝对路径 + 节名**（喂节不喂
+全文）。**审查 agent 只读**——明确禁止其改代码，代码修改永远回到主会话。
 
 ## 阶段 3：审查-修复-复查循环（最多 5 轮，软上限）
 
@@ -67,14 +77,15 @@ description: PR 建立后的对抗审查-修复-复查循环，直到代码可�
 1. **收报告 → 汇总去重**：两路同报的置顶（最高置信）；单路 finding 按严重级
    排序（blocker > major > minor > nit）；
 2. **逐条强制归入四分类**（读 `references/lead-judgment.md` 的判断框架）：
-   - **修**：blocker / major，改代码；
-   - **顺手修**：低成本 nit 且不扩大 diff（Laziness 边界）；
+   - **修**：blocker / major，改代码（优先让该类错误写不出来的修法）；
+   - **顺手修**：低成本 nit 且不扩大 diff（改动半径几行内）；
    - **落档不改**：有明确理由不改，理由写进复查消息让审查者确认；
    - **驳回**：引用 lead-judgment 的过滤原则显式点名（hypothetical vs. actual /
      premature abstraction / 换我不会这么写 / missing context / nitpick gravity），
      双路共识的 finding 驳回时必须给比单路更强的证据；
 3. **有代码改动** → 重跑验证命令全绿 → 逐路径提交 → push（复查看的是远端
-   最新 diff，不 push 不发复查）;
+   最新 diff，不 push 不发复查）；**零改动轮（全落档/全驳回）同样发复查**
+   （HASH 填当前 HEAD）——该路需要显式「通过」才能结清；
 4. **发复查消息**（`references/recheck-template.md` 模板）：给**原**审查 agent
    （上下文连续，不换新 agent），带 commit hash + 已修清单 + 落档不改项及理由，
    **只问「通过 / 不通过 + 理由」**——不许展开新审查面（防范围膨胀）；
@@ -98,11 +109,15 @@ description: PR 建立后的对抗审查-修复-复查循环，直到代码可�
 全部满足才算完（缺一即不算）：
 
 - [ ] 所有审查路返回「通过」；
-- [ ] 验证命令集全绿，且是修复后的**最终代码**跑的（不是修复前的缓存结果）；
+- [ ] 验证命令集全绿，且是修复后的**最终代码**跑的（不是修复前的缓存结果；
+  带构建缓存的仓库用 `--force` 重跑受影响部分，或核对输出确为 cache miss）；
 - [ ] 每条 finding 已归档处置（修 / 落档 / 驳回），无悬空项；
 - [ ] 「落档不改」与「驳回」的理由在复查中获审查者确认（或审查者未反对）；
-- [ ] **防假绿抽查**：无新增 skip / 被注释的用例、无断言被删或被改以迁就
-  实现（Prove It Works：验真产物，不验「它说它过了」）。
+- [ ] **防假绿抽查**：对 diff 逐 hunk 检查——新增 skip / 被注释的用例 /
+  被删或被改的断言，与基准分支比**增量**（仓库既有 skipIf 模式不计）；
+  验真产物本身，不验「它说它过了」；
+- [ ] 处置台账已回写 PR 描述（审查记录节），本地未覆盖、待 CI 验证的项
+  一并列出。
 
 产出收口报告：轮次数、各路 finding 数与处置分布（修 X / 落档 Y / 驳回 Z）、
 最终验证数字、已知残留（nit 级）→ 告知用户「可合并」。
@@ -117,14 +132,14 @@ description: PR 建立后的对抗审查-修复-复查循环，直到代码可�
 - minor 的准入门槛：必须指出具体的将来成本，答不出将来成本自动降 nit
   （防品味倾倒）；
 - 用户可随时打断；每轮结束简报状态（第几轮、还剩几条未清零）；
-- 复查消息短（Guard the Context Window）：只带增量，不重贴 rubric。
+- 复查消息短（只带增量，不重贴 rubric——审查者的注意力也是预算）。
 
 ## 参考文件索引
 
 | 文件 | 何时读 |
 | --- | --- |
-| `references/rubric-correctness.md` | 阶段 2 组路 A 时，随审查指令一起喂给 agent |
-| `references/rubric-risk-lanes.md` | 阶段 2 判定组哪条风险路时 |
+| `references/rubric-correctness.md` | 阶段 2 组路 A 时，作为路 A 章程指给审查 agent 读 |
+| `references/rubric-risk-lanes.md` | 阶段 2 判定组哪条风险路时；各路章程所在文件（按节锚点喂给对应路） |
 | `references/reviewer-prompt.md` | 阶段 2 派发审查 agent 时 |
 | `references/recheck-template.md` | 阶段 3 每轮发复查消息时 |
-| `references/lead-judgment.md` | 阶段 3 处置分类与驳回判断时 |
+| `references/lead-judgment.md` | 阶段 3 处置分类、驳回判断时；阶段 4 归档核验与台账产出 |
