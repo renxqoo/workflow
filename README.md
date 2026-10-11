@@ -10,6 +10,7 @@
 | [feature-dev](skills/feature-dev/SKILL.md) | 新功能开发生产级工作流（fork 自 feature-dev-v2）：需求分级 → 方案先行 → 测试口径先定 → 小步实现四门验证 → 对抗审查 → 收口验收 |
 | [pr-review-loop](skills/pr-review-loop/SKILL.md) | PR 建立后的对抗审查-修复-复查循环：风险面组路（agent 裁量路数）、finding 四分类处置、原审查者复查、共识诚实降级（同源模型先验共享）、回归用例结构化、CI/owner 收口三态 |
 | [repo-migration](skills/repo-migration/SKILL.md) | 旧仓库/单体应用迁移重构到新架构的全流程方法论（fork 自 repo-migration-e2e-v2）：三件文档先行、逐模块裁决、隔离式 e2e 装置、双形态冒烟、验收核销 |
+| [verify-harness](skills/verify-harness/SKILL.md) | 为仓库生成并持续维护验证装置：验证命题先讲清（四门验自洽、单测验零件、对抗审意图、本装置验「组装后的交付物在真实形态下产生声称的行为」）；资产盘点（包装复用既有 e2e/kit/fake，不另起炉灶）→ 仓库访谈五问（锚点交付物，不预设目录形态）→ 装置文档（launch/doctor/drive/evidence/cleanup + 默认/冒烟/real 三门）+ 功能地图（改动面→旅程映射）→ 自证跑通才交付；维护模式做防腐审计（源读波/活跑波/三分类处置） |
 
 三件套流水线：**to-issue（问题定义）→ feature-dev（读 issue 实现，PR 带 Closes #N）→ pr-review-loop（审查，残留 finding 回流 to-issue）**。接力模式不锁定：人工逐段发起，或编排 agent 接管全流程（软件工厂形态）均可——每个 skill 的产出物自带下游接力指引，两种模式共用。
 

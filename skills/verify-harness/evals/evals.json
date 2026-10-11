@@ -1,0 +1,23 @@
+{
+  "skill_name": "verify-harness",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我给 /Users/wrr/work/x-harness 这个仓库建一套 e2e 验证装置。这个仓库有一切皆插件的 agent 运行时，packages/e2e/src/main.ts 里有 16 个旅程函数但每次都要全量跑，AGENTS.md 里写着「e2e 不要每次都全量跑，修改哪些功能就跑对应的 e2e」。我想让 agent 改完代码知道该跑哪个旅程，也想把这些验证方式沉淀成文档。",
+      "expected_output": "走生成模式：资产盘点发现 packages/e2e 的 16 个旅程 + scripts/check.ts；访谈五问从 README/package.json 推断交付物（CLI + hub 宿主）；生成 verify/ 装置文档 + 改动面映射表（把 16 个旅程归纳为语义改动面）；自证跑一个旅程；不另起炉灶、不搬家既有旅程",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我们项目是个 Python Flask 单文件应用 app.py，大概 800 行，没有任何测试。我想让 AI 改完代码后能自己验证应用还能正常工作，至少注册、登录、下单这几个流程。帮我搞一套。",
+      "expected_output": "走生成模式且是空仓路径：不预设 apps/ 或 monorepo 结构；访谈五问从 app.py + requirements.txt + README 推断交付物（HTTP 服务）；建最小装置（隔离数据目录 + Flask test client 或真进程 + 一条注册→登录→下单旅程）；断言副作用（DB 行/会话状态），不只是 200；库交付物形态无偏见",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "verify/ 里之前生成的功能地图好像过时了：features/README.md 还写着「导出按钮在设置页第二项」，但上周改版后导出移到了顶栏。另外跑 billing-recovery 旅程时 doctor 挂了，说连不上数据库。帮我处理一下。",
+      "expected_output": "进维护模式且先做三分类：doctor 连不上库可能是装置缺口（连接串漂移）或环境问题，先修重试一次；导出按钮位置变了是文档漂移，修地图；守源读波只读/活跑波协调者统一驾驶的角色分离；产品没坏就不建 issue，如果发现真 bug 走 to-issue 而不是把坏行为写进文档",
+      "files": []
+    }
+  ]
+}
