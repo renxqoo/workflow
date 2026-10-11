@@ -116,4 +116,4 @@ issue 会污染下游队列。
 | --- | --- |
 | `references/issue-templates.md` | 阶段 2 定类型后、阶段 5 写正文时（一骨架三类型 + 耐久性纪律） |
 | `references/locating.md` | 阶段 3 定位加工时（三档判据、回路手段、假设排序格式、反过度闸） |
-| `references/clarifying.md` | 阶段 4 澄清时（前沿轮询、事实/决策二分、裁决标注格式） |
+| `references/clarifying.md` | 阶段 4 澄清时（前沿轮询、事实三分、裁决标注格式） |
