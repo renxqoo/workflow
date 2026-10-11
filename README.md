@@ -6,7 +6,11 @@
 
 | skill | 用途 |
 | --- | --- |
-| [pr-review-loop](skills/pr-review-loop/SKILL.md) | PR 建立后的对抗审查-修复-复查循环，直到代码可安全合并：按 diff 风险面组多路独立审查 agent（正确性恒定 + 风险路按触发条件），finding 四分类处置（修/顺手修/落档不改/驳回），修复推送后原审查者复查，循环直到全部通过；5 软轮上限 + 诊断三分类升级，防假绿抽查收口 |
+| [to-issue](skills/to-issue/SKILL.md) | 现象 → 结构化 issue：证据工厂定位（三档纪律，档 2 复现脚本是全链路资产）+ 查重合并 + grilling 澄清（裁决标注契约，下游免重问）+ 零上下文自检发布 + 生命周期回写。管生不管接 |
+| [feature-dev](skills/feature-dev/SKILL.md) | 新功能开发生产级工作流（fork 自 feature-dev-v2）：需求分级 → 方案先行 → 测试口径先定 → 小步实现四门验证 → 对抗审查 → 收口验收 |
+| [pr-review-loop](skills/pr-review-loop/SKILL.md) | PR 建立后的对抗审查-修复-复查循环：风险面组路（agent 裁量路数）、finding 四分类处置、原审查者复查、共识诚实降级（同源模型先验共享）、回归用例结构化、CI/owner 收口三态 |
+
+三件套流水线：**to-issue（问题定义）→ feature-dev（读 issue 实现，PR 带 Closes #N）→ pr-review-loop（审查，残留 finding 回流 to-issue）**。手动接力：每个 skill 的产出物自带下游接力说明。
 
 ## 结构约定
 
