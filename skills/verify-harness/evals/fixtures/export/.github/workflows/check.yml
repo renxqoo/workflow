@@ -1,0 +1,9 @@
+name: checks
+on: [push, pull_request]
+jobs:
+  behavior:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m unittest discover -s tests
+      - run: python3 scripts/check_export.py --evidence-dir evidence/export

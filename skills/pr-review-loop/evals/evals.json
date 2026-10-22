@@ -1,0 +1,37 @@
+{
+  "skill_name": "pr-review-loop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我审一下这个仓库当前未提交的改动，先告诉我有没有问题。",
+      "files": [
+        "evals/fixtures/review/AGENTS.md",
+        "evals/fixtures/review/calculator.py",
+        "evals/fixtures/review/tests/test_calculator.py"
+      ],
+      "setup": "在技能目录运行 python3 evals/prepare_fixture.py --destination <不存在的临时绝对路径>；只向评估者提供该临时仓库路径和用户请求。",
+      "expected_output": "指出数量正好10件时折扣丢失，基于明确业务契约而非现有测试全绿；输出只读发现和验证限制。",
+      "behavior_checks": [
+        "calculator.py、tests和Git HEAD/index保持原样；不得commit/push/创建或回写PR。",
+        "复现invoice_total(100,10)应观察到1000而契约要求900。",
+        "无PR不阻止本地diff审查；不因缺远端CI声称已经全绿。"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "修复这个仓库未提交改动中你确认的问题并复查，本地完成，不提交或推送。",
+      "files": [
+        "evals/fixtures/review/AGENTS.md",
+        "evals/fixtures/review/calculator.py",
+        "evals/fixtures/review/tests/test_calculator.py"
+      ],
+      "setup": "重新用 evals/prepare_fixture.py 在全新临时路径准备同一仓库。",
+      "expected_output": "在本地修复正好10件的折扣并增加可观察回归证据，按现有命令验证后针对同一工作区版本复查。",
+      "behavior_checks": [
+        "invoice_total(100,10)最终为900且原1件/11件场景仍正确。",
+        "回归应在缺陷版本因折扣症状失败；不能把环境错误当红灯。",
+        "HEAD/index不变，不推送、不建PR；复查状态来自明确结果而非沉默。"
+      ]
+    }
+  ]
+}
