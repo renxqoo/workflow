@@ -1,0 +1,55 @@
+{
+  "skill_name": "test",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "为分页模块补齐文档约定的单测，只改测试，本地完成，不提交。",
+      "files": [
+        "evals/fixtures/pagination/AGENTS.md",
+        "evals/fixtures/pagination/pagination.py",
+        "evals/fixtures/pagination/tests/test_pagination.py"
+      ],
+      "setup": "复制 fixtures/pagination 到独立临时目录，初始化本地 Git 并提交初始夹具；不要向评估者提供预期结论。",
+      "expected_output": "补充能覆盖明确分页契约的真实单测，期望独立，针对相关边界和可观察结果；已有正确实现上的新增测试允许直接通过。",
+      "behavior_checks": [
+        "pagination.py、AGENTS.md、HEAD/index保持原样，不新增依赖或修改门禁。",
+        "测试覆盖默认20条、页码0、每页1/100及0/101、末页不足、超范围为空、输入不变和独立容器、响应协议及对应记录。",
+        "不因补测试任务擅自批量清理原有用例；不得为展示红灯修改产品实现。",
+        "独立在隔离副本施加默认条数、上限包含关系、返回记录等相关错误时，新增测试应能失败；报告真实测试数，未采集覆盖率须说明。"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "清理这个模块没有验证价值的单测，可以改写、合并或删除；只改测试，并说明理由。",
+      "files": [
+        "evals/fixtures/pagination/AGENTS.md",
+        "evals/fixtures/pagination/pagination.py",
+        "evals/fixtures/pagination/tests/test_pagination.py"
+      ],
+      "setup": "在全新独立临时 Git 仓库准备同一夹具，不复用上一次评估的测试变更。",
+      "expected_output": "清理恒真、无契约常量复述、自建数据自验和只验证mock的用例；处理重复与过松断言，保留或替换有效契约测试。",
+      "behavior_checks": [
+        "不修改产品、契约、HEAD/index或依赖，不为清理扩大为产品重构。",
+        "能区分任意spinner数值断言与有独立对外协议依据的schema断言。",
+        "正常分页、非法页码、协议标识等原有独立保障保留或经有效用例替换；复制算法的期望改为独立依据，响应测试实际约束记录内容。",
+        "说明删除和替换理由及覆盖去向；运行真实验证，不用测试减少数量或行覆盖率代替质量证据。"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "只审查这些单测逻辑是否合理，指出问题和建议，不修改文件。",
+      "files": [
+        "evals/fixtures/pagination/AGENTS.md",
+        "evals/fixtures/pagination/pagination.py",
+        "evals/fixtures/pagination/tests/test_pagination.py"
+      ],
+      "setup": "使用同一夹具的新副本，记录所有输入文件摘要。",
+      "expected_output": "按独立契约、错误探测能力和实现耦合程度报告问题，不按常量或mock语法一刀切。",
+      "behavior_checks": [
+        "所有源文件、测试、Git HEAD/index保持原样。",
+        "指出有效协议常量断言可以保留；清理候选与理由应基于具体测试逻辑。",
+        "只作审查结论，不能把尚未改写的用例或未运行的验证写成已经完成。"
+      ]
+    }
+  ]
+}

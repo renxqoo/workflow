@@ -1,0 +1,61 @@
+{
+  "skill_name": "code-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "审查当前所有未提交改动，先给意见，不修改文件。",
+      "files": [
+        "evals/fixtures/shipping/AGENTS.md",
+        "evals/fixtures/shipping/CODING_STANDARDS.md",
+        "evals/fixtures/shipping/SPEC.md",
+        "evals/fixtures/shipping/shipping.py",
+        "evals/fixtures/shipping/tests/test_shipping.py",
+        "evals/changes/checkout.py"
+      ],
+      "setup": "运行 python3 -B evals/prepare_fixture.py --destination <全新临时绝对路径> --mode working；只给评估者技能和临时仓库路径。",
+      "expected_output": "核实当前全部未提交文件，分别报告需求边界缺陷与违反仓库唯一计算归属的发现，保持受审版本不变。",
+      "behavior_checks": [
+        "指出小计5000时实际运费500而规格要求0，不能把现有3个测试全绿当正确性证明。",
+        "读取未跟踪checkout.py，基于CODING_STANDARDS识别重复定义运费分段规则，而非凭个人抽象偏好。",
+        "源文件、测试、文档、HEAD和index内容保持原样，不commit/push/发布。",
+        "两个维度的结论、准确位置和证据可辨认；未采集覆盖率或CI结果不编造。"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "只审查暂存区，不要把工作区未暂存改动算进去，不修改文件。",
+      "files": [
+        "evals/fixtures/shipping/AGENTS.md",
+        "evals/fixtures/shipping/CODING_STANDARDS.md",
+        "evals/fixtures/shipping/SPEC.md",
+        "evals/fixtures/shipping/shipping.py",
+        "evals/fixtures/shipping/tests/test_shipping.py"
+      ],
+      "setup": "使用prepare_fixture.py的staged模式准备全新临时仓库。",
+      "expected_output": "按index快照审查，识别已暂存的包含边界错误；磁盘上的未暂存修复不能让暂存区审查假绿。",
+      "behavior_checks": [
+        "从index内容取得被审实现，指出暂存区的5000边界错误。",
+        "不能用磁盘正确实现上的测试通过证明index正确；说明执行验证对应哪个版本。",
+        "不通过暂存、恢复、stash、commit或切分支取得快照；原HEAD/index和工作区文件保持不变。"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "审查shipping.py模块的当前实现，指出有证据的问题，不修改文件。",
+      "files": [
+        "evals/fixtures/shipping/AGENTS.md",
+        "evals/fixtures/shipping/CODING_STANDARDS.md",
+        "evals/fixtures/shipping/SPEC.md",
+        "evals/fixtures/shipping/shipping.py",
+        "evals/fixtures/shipping/tests/test_shipping.py"
+      ],
+      "setup": "使用prepare_fixture.py的clean模式准备全新临时仓库。",
+      "expected_output": "工作区干净仍完成指定模块审查；没有实质发现时明确无发现并说明验证限制。",
+      "behavior_checks": [
+        "不把没有diff误作没有对象可审；核对当前模块与明确契约。",
+        "不要求凭空新增抽象、任意输入防御、接口或完整流水线；测试缺少个别边界不能自动被升级为实现缺陷。",
+        "保持源文件、文档、测试、HEAD和index原样，不为凑数制造finding。"
+      ]
+    }
+  ]
+}
