@@ -2,6 +2,16 @@
 
 通用 agent skill 集合，用于需求整理、实现、调查、审查和验证。具体技术栈、架构边界与检查命令从目标仓库读取，遵循当前任务授权和该仓库的 `AGENTS.md`。
 
+## 作为 Codex 插件安装
+
+在 Codex 的插件市场中添加本仓库的 Git 地址，或选择本地仓库根目录，然后从 **Workflow** 市场安装 **Workflow** 插件。也可以通过命令添加本地市场：
+
+```sh
+codex plugin marketplace add /path/to/workflow
+```
+
+使用 Git 地址时，市场清单和技能文件都必须存在于所选 Git ref 中；如果配置 Sparse paths，需要同时包含 `.agents/plugins`、`.codex-plugin` 和 `skills`。修改本地插件后，请刷新插件并按需重启应用。
+
 ## 选择 skill
 
 | Skill | 适用请求 | 主要产出 |
