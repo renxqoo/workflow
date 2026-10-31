@@ -31,7 +31,6 @@ codex plugin marketplace add /path/to/workflow
 | [how](skills/how/SKILL.md) | 解释当前实现、运行流程或代码归属 | 有源码依据的调用流程、状态变化和边界说明 |
 | [why](skills/why/SKILL.md) | 调查设计理由、历史取舍或阈值来源 | 已证实理由、合理推断及仍未知的部分 |
 | [unslop](skills/unslop/SKILL.md) | 精简文档、报告或其他文字 | 保留事实和术语、表达直接的文本 |
-| [lark-project-progress](skills/lark-project-progress/SKILL.md) | 按代码或已知进度维护飞书项目任务表 | 功能拆分、增量同步、页面分组与有依据的进度汇报 |
 
 按请求选择必要的 skill，不要求任务走完整流水线。已有清楚的需求可以直接实现；普通测试不必启动系统性验证；局部审查不必创建 PR；修复一个 bug 不等于迁移架构。
 
@@ -46,7 +45,6 @@ codex plugin marketplace add /path/to/workflow
 - 明确的架构迁移使用 `repo-migration`，按已确认目标区分应保留的行为和应纠正的缺陷。
 - `code-review` 负责一次日常只读审查；明确要求多轮审查、修复和复查时使用 `pr-review-loop`，同样支持本地差异。只有本次任务已授权修复，才修改代码；只有已授权发布，才推送、建 PR 或回写外部系统。
 - `how` 回答现在怎样运行，`why` 调查为什么这样设计。当前实现可以直接核实，历史动机需要证据支持。
-- `lark-project-progress` 是可选的平台进度适配，不负责执行任务；已有编排计划可作为同步输入，任务表状态不替代代码验收。
 
 这些组合是可选的。技能可以独立使用；缺少相邻 skill 时，不因流程名称中断已授权任务。
 
