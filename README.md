@@ -1,6 +1,6 @@
 # Workflow
 
-通用 agent skill 集合，用于需求整理、实现、调查、审查和验证。具体技术栈、架构边界与检查命令从目标仓库读取，遵循当前任务授权和该仓库的 `AGENTS.md`。
+通用 agent skill 集合，用于需求整理、架构与服务端设计、实现、调查、审查和验证。具体技术栈、架构边界与检查命令从目标仓库读取，遵循当前任务授权和该仓库的 `AGENTS.md`。
 
 ## 作为 Codex 插件安装
 
@@ -18,6 +18,9 @@ codex plugin marketplace add /path/to/workflow
 | --- | --- | --- |
 | [to-spec](skills/to-spec/SKILL.md) | 将已有讨论整理为需求规格 | 目标、范围、验收条件、实现决策与未决事项 |
 | [to-issue](skills/to-issue/SKILL.md) | 整理问题草稿或明确要求建立工单 | 证据、复现或调查假设、验收条件与交接说明 |
+| [architecture-design](skills/architecture-design/SKILL.md) | 设计系统架构、模块边界或比较关键方案 | 职责与数据归属、接口与协作、方案取舍、演进及验证 |
+| [backend-design](skills/backend-design/SKILL.md) | 设计服务端业务、API、数据与事务 | 领域与状态、接口契约、并发与异步恢复、实施及验收 |
+| [task-orchestrator](skills/task-orchestrator/SKILL.md) | 拆分任务并委派全新上下文子代理执行 | 依赖任务、逐项派发与核验、有限修复、集成与恢复记录 |
 | [feature-dev](skills/feature-dev/SKILL.md) | 实现功能或修复已授权的问题 | 按风险分级的方案、实现、回归与验证结果 |
 | [test](skills/test/SKILL.md) | 设计、编写、审查或清理测试 | 独立预期、有效断言、行为用例及测试处置依据 |
 | [tdd](skills/tdd/SKILL.md) | 先测试后实现，或为 bug 建立回归用例 | 修复前失败、修复后通过的行为证据 |
@@ -28,18 +31,22 @@ codex plugin marketplace add /path/to/workflow
 | [how](skills/how/SKILL.md) | 解释当前实现、运行流程或代码归属 | 有源码依据的调用流程、状态变化和边界说明 |
 | [why](skills/why/SKILL.md) | 调查设计理由、历史取舍或阈值来源 | 已证实理由、合理推断及仍未知的部分 |
 | [unslop](skills/unslop/SKILL.md) | 精简文档、报告或其他文字 | 保留事实和术语、表达直接的文本 |
+| [lark-project-progress](skills/lark-project-progress/SKILL.md) | 按代码或已知进度维护飞书项目任务表 | 功能拆分、增量同步、页面分组与有依据的进度汇报 |
 
 按请求选择必要的 skill，不要求任务走完整流水线。已有清楚的需求可以直接实现；普通测试不必启动系统性验证；局部审查不必创建 PR；修复一个 bug 不等于迁移架构。
 
 ## 组合方式
 
 - 需要整理需求时先用 `to-spec`，实现时进入 `feature-dev`。规格已充分时直接复用，不重新访谈或起草平行方案。
+- 系统或模块职责需要设计时使用 `architecture-design`；服务端接口、数据与事务需要细化时使用 `backend-design`。两者可以独立使用，已有架构决定直接复用；设计请求默认交付方案，实施按本次授权进入 `feature-dev` 或 `repo-migration`。
+- 明确要求拆分后委派执行时使用 `task-orchestrator`：协调者管理依赖、版本与验收，每项任务、修复和重试新建上下文；默认串行，有隔离条件再并行。它复用设计、开发、迁移和审查方法，不复制一套领域流程。只要求拆分时仅交付计划。
 - `to-issue` 交接问题定义和已有证据。接手实现时重放相关复现，复用已确认的决定，不重复询问。
 - `test` 负责用例设计、断言质量与已有测试清理；`tdd` 处理先失败后通过的实现或修复循环。两者都复用实际契约与已有入口，不强制给已正确行为补测试制造红灯。
 - `verify-harness` 处理跨边界行为、真实交付物和验证装置；普通补测试不展开系统性验证。已有测试入口优先复用。
 - 明确的架构迁移使用 `repo-migration`，按已确认目标区分应保留的行为和应纠正的缺陷。
 - `code-review` 负责一次日常只读审查；明确要求多轮审查、修复和复查时使用 `pr-review-loop`，同样支持本地差异。只有本次任务已授权修复，才修改代码；只有已授权发布，才推送、建 PR 或回写外部系统。
 - `how` 回答现在怎样运行，`why` 调查为什么这样设计。当前实现可以直接核实，历史动机需要证据支持。
+- `lark-project-progress` 是可选的平台进度适配，不负责执行任务；已有编排计划可作为同步输入，任务表状态不替代代码验收。
 
 这些组合是可选的。技能可以独立使用；缺少相邻 skill 时，不因流程名称中断已授权任务。
 
@@ -74,4 +81,4 @@ skills/<skill-name>/
 
 ## 来源与许可
 
-`code-review` 的双维度审查与证据判断、`test` 的测试质量与用例设计参考 pstack 和 Matt Pocock 的 skills；`tdd`、`unslop`、`how` 和 `why` 改编自 pstack；`to-spec` 改编自 Matt Pocock 的 skills。对应技能目录保留各自上游的 MIT 许可。技能内容以本仓库维护的文件为准。
+`code-review` 的双维度审查与证据判断、`test` 的测试质量与用例设计参考 pstack 和 Matt Pocock 的 skills；`architecture-design`、`backend-design` 参考两者的模块边界、接口优先和方案比较方法，服务端专项内容由本仓库维护；`task-orchestrator` 参考两者的任务图、上下文指针和独立工作区方法；`tdd`、`unslop`、`how` 和 `why` 改编自 pstack；`to-spec` 改编自 Matt Pocock 的 skills。对应技能目录保留各自上游的 MIT 许可。技能内容以本仓库维护的文件为准。

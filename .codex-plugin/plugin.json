@@ -1,11 +1,11 @@
 {
   "name": "workflow",
   "version": "1.0.0",
-  "description": "通用 agent skill 集合，用于需求整理、实现、调查、审查和验证。",
+  "description": "通用 agent skill 集合，用于需求整理、设计、全新代理任务编排、实现、调查、审查和验证。",
   "skills": "./skills/",
   "interface": {
     "displayName": "Workflow",
-    "shortDescription": "需求、开发、审查与验证工作流",
-    "longDescription": "提供用于需求整理、实现、调查、审查和验证的通用技能。"
+    "shortDescription": "需求、设计、任务编排、开发与验证工作流",
+    "longDescription": "提供用于需求整理、架构与服务端设计、全新代理任务编排、实现、调查、审查和验证的通用技能。"
   }
 }

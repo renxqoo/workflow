@@ -1,0 +1,3 @@
+interface:
+  display_name: "任务拆分与编排"
+  short_description: "拆分有依赖的可验证任务，使用全新上下文子代理逐项执行并核验交付"

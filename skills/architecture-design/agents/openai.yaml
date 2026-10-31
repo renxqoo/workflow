@@ -1,0 +1,3 @@
+interface:
+  display_name: "架构设计"
+  short_description: "梳理系统与模块边界、比较关键方案并形成可验证的架构设计"

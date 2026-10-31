@@ -1,0 +1,25 @@
+{
+  "deployments": ["api"],
+  "storage": "PostgreSQL",
+  "modules": [
+    {
+      "name": "orders",
+      "entrypoints": ["create_order", "list_orders"],
+      "writes": ["orders", "order_lines"],
+      "calls": ["notifications.send"],
+      "knowledge": ["order filters", "amount rules"]
+    },
+    {
+      "name": "exports",
+      "entrypoints": ["export_orders"],
+      "reads": ["orders", "order_lines"],
+      "writes": ["exports"],
+      "knowledge": ["order filters", "CSV format"]
+    },
+    {
+      "name": "notifications",
+      "entrypoints": ["send"],
+      "dependencies": ["external notification provider"]
+    }
+  ]
+}
