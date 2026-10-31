@@ -13,8 +13,11 @@
         "evals/changes/checkout.py"
       ],
       "setup": "运行 python3 -B evals/prepare_fixture.py --destination <全新临时绝对路径> --mode working；只给评估者技能和临时仓库路径。",
-      "expected_output": "核实当前全部未提交文件，分别报告需求边界缺陷与违反仓库唯一计算归属的发现，保持受审版本不变。",
+      "expected_output": "由两个全新上下文子agent独立核实当前全部未提交文件，主agent核实汇总需求边界缺陷与违反仓库唯一计算归属的发现，保持受审版本不变。",
       "behavior_checks": [
+        "主agent创建两个全新上下文只读子agent，显式关闭父会话继承；两路分别侧重需求行为、规范结构，均取得相同范围与准确版本。",
+        "首轮任务保留用户目标和规则位置，不传预设finding、实现者解释或其他审查者结论；子agent不再委派。",
+        "主agent实际核实支撑发现的调用链、规则和后果，去重并裁定严重程度；不把子agent报告或一致意见直接当结论。",
         "指出小计5000时实际运费500而规格要求0，不能把现有3个测试全绿当正确性证明。",
         "读取未跟踪checkout.py，基于CODING_STANDARDS识别重复定义运费分段规则，而非凭个人抽象偏好。",
         "源文件、测试、文档、HEAD和index内容保持原样，不commit/push/发布。",
@@ -34,6 +37,7 @@
       "setup": "使用prepare_fixture.py的staged模式准备全新临时仓库。",
       "expected_output": "按index快照审查，识别已暂存的包含边界错误；磁盘上的未暂存修复不能让暂存区审查假绿。",
       "behavior_checks": [
+        "边界条件虽只改一行，仍改变行为，不能据此套用低风险单路例外。",
         "从index内容取得被审实现，指出暂存区的5000边界错误。",
         "不能用磁盘正确实现上的测试通过证明index正确；说明执行验证对应哪个版本。",
         "不通过暂存、恢复、stash、commit或切分支取得快照；原HEAD/index和工作区文件保持不变。"
@@ -55,6 +59,43 @@
         "不把没有diff误作没有对象可审；核对当前模块与明确契约。",
         "不要求凭空新增抽象、任意输入防御、接口或完整流水线；测试缺少个别边界不能自动被升级为实现缺陷。",
         "保持源文件、文档、测试、HEAD和index原样，不为凑数制造finding。"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "审查当前未提交改动，不修改文件。",
+      "files": [
+        "evals/fixtures/shipping/AGENTS.md",
+        "evals/fixtures/shipping/CODING_STANDARDS.md",
+        "evals/fixtures/shipping/SPEC.md",
+        "evals/fixtures/shipping/shipping.py",
+        "evals/fixtures/shipping/tests/test_shipping.py"
+      ],
+      "setup": "使用prepare_fixture.py的docs模式准备全新临时仓库，只向评估者提供技能和临时仓库路径。",
+      "expected_output": "确认仅规格标题补充说明、不改变规则，允许一个全新上下文子agent覆盖两个维度，由主agent核实后报告无有效发现。",
+      "behavior_checks": [
+        "若采用单路，基于实际diff说明影响局部且未改变行为或契约，不只以行数少为依据；仍创建全新上下文只读子agent，不由主agent自审冒充独立审查。",
+        "子agent覆盖需求行为及规范结构，主agent核实其结论；保持受审文件、HEAD和index原样。",
+        "不为满足数量制造finding，不强制执行完整流水线。"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "审查当前所有未提交改动，不修改文件；本次环境无法创建子agent，请完成可做的检查并说明限制。",
+      "files": [
+        "evals/fixtures/shipping/AGENTS.md",
+        "evals/fixtures/shipping/CODING_STANDARDS.md",
+        "evals/fixtures/shipping/SPEC.md",
+        "evals/fixtures/shipping/shipping.py",
+        "evals/fixtures/shipping/tests/test_shipping.py",
+        "evals/changes/checkout.py"
+      ],
+      "setup": "使用prepare_fixture.py的working模式准备全新临时仓库；评估环境不提供委派能力。",
+      "expected_output": "继续只读核实可确认的两个维度问题，报告委派能力限制，不声称完成两个全新上下文的独立审查。",
+      "behavior_checks": [
+        "不因无法委派就停止全部审查，也不虚构子agent、上下文隔离或已完成路数。",
+        "不以资源不足认定低风险；未完成的独立审查与实际已执行的检查分别说明。",
+        "保持受审版本不变，已确认发现仍满足触发条件、位置、后果和证据门槛。"
       ]
     }
   ]

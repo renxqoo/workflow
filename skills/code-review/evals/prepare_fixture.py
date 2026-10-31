@@ -25,7 +25,11 @@ def prepare(destination, mode):
     git(destination, "config", "core.hooksPath", "/dev/null")
     git(destination, "add", ".")
     git(destination, "commit", "-q", "-m", "Baseline fixture")
-    if mode != "clean":
+    if mode == "docs":
+        target = destination / "SPEC.md"
+        original = target.read_text()
+        target.write_text(original.replace("# Shipping contract\n", "# Shipping contract reference\n", 1))
+    elif mode != "clean":
         target = destination / "shipping.py"
         original = target.read_text()
         assert original.count("subtotal_cents >= 5000") == 1
@@ -42,6 +46,6 @@ def prepare(destination, mode):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--destination", type=Path, required=True)
-    parser.add_argument("--mode", choices=("working", "staged", "clean"), required=True)
+    parser.add_argument("--mode", choices=("working", "staged", "clean", "docs"), required=True)
     arguments = parser.parse_args()
     prepare(arguments.destination, arguments.mode)
