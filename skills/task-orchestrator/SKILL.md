@@ -54,4 +54,4 @@ description: 将目标或规格拆成有依赖和验收条件的任务，使用�
 
 - `feature-dev`、`repo-migration` 提供实现或迁移方法，`architecture-design`、`backend-design` 提供确有需要的设计；本技能只管理任务与执行，不重新发明这些流程。
 - `test`、`code-review` 和 `verify-harness` 仅在任务需要时提供相应方法，不让每张任务走完整流水线；显式调用策略仍按宿主和用户选择执行。
-- `to-issue`、`lark-project-progress` 负责已授权的工单或进度同步，不能以发布状态代替本地验收。相邻技能不可用时按任务契约完成能做的部分，不先强制安装它们。
+- `to-issue` 负责已授权的工单或进度同步，不能以发布状态代替本地验收。相邻技能不可用时按任务契约完成能做的部分，不先强制安装它们。
